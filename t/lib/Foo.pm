@@ -1,5 +1,5 @@
 package Foo;
-use Drogo::Dispatch;
+use Drogo::Dispatch( import_drogo_methods => 1 );
 use strict;
 use Foo::bar;
 
@@ -20,5 +20,12 @@ sub waffle :ActionMatch
 
 sub error        { shift->status(404) }
 sub bad_dispatch { shift->error       }
+
+sub waffles :ActionRegex('har/(.*)/roop')
+{
+    my $self = shift;
+    my ($a) = $self->post_args;
+    $self->print($a);
+}
 
 1;

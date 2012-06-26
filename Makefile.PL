@@ -13,6 +13,7 @@ requires 'CGI::Cookie';
 requires 'Time::HiRes';
 requires 'YAML';
 requires 'File::Path';
+requires 'URI';
 
 install_script glob('bin/drogo');
 

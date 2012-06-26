@@ -8,7 +8,7 @@ use lib 'lib';
 use Foo;
 use Drogo::Server::Test;
 
-use Test::More tests => 14;
+use Test::More tests => 15;
 
 my $server = Drogo::Server::Test->new;
 
@@ -35,3 +35,5 @@ cmp_ok( Foo->handler( uri => '/bar/mood' )->{output}, 'eq', 'cows go moo', 'cros
 # test 404
 cmp_ok( Foo->handler( uri => '/badpage' )->{status}, '==', '404', 'bad dispatching uses error sub');
 
+# test regex dispatching
+cmp_ok( Foo->handler( uri => '/har/waffle/roop' )->{output}, 'eq', 'waffle', 'regex matching works');

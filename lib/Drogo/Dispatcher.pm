@@ -7,6 +7,8 @@ use base qw(
 
 use strict;
 
+use Drogo::Dispatcher::Request;
+
 our @EXPORT = qw(dig_for_dispatch);
 
 # keep a list of dispatched paths
@@ -14,7 +16,7 @@ my %path_cache;
 
 =head1 NAME 
 
-Drogo::Dispatcher
+Drogo::Dispatcher - Internals for Drogo dispatching
 
 =head1 Synopsis
 
@@ -147,6 +149,8 @@ sub dig_for_dispatch
                 my $method     = pop @jump_paths;
                 my $jump_class = join('::', $class, @jump_paths);
 
+                &_class_is_imported($jump_class) if $params{auto_import};
+
                 if (UNIVERSAL::can($jump_class, 'get_dispatch_flags'))
                 {
                     my $dispatch_flags = $jump_class->get_dispatch_flags;
@@ -165,7 +169,57 @@ sub dig_for_dispatch
                             post_args    => \@post_args,
                         };
                     }
+
+                    # check every action matching regex
+                    for my $m (keys %$dispatch_flags)
+                    {
+                        my $a = $dispatch_flags->{$m};
+                        my ($act, $attr) = split('-', $a);
+
+                        next if $act ne 'action_regex' and $act ne 'path';
+
+                        if ($act eq 'action_regex')
+                        {
+                            my $post_args = join('/', $method, @post_args);
+                            my @results = ( $post_args =~ /$attr/ );
+
+                            if (@results)
+                            {
+                                my $subptr = join('::', $jump_class, $m);
+
+                                return {
+                                    class        => $jump_class,
+                                    method       => $m,
+                                    sub          => \&$subptr,
+                                    index        => 0,
+                                    dispatch_url => $called_path,
+                                    post_args    => \@results,
+                                };
+                            }
+                        }
+                        elsif ($act eq 'path')
+                        {
+                            my $post_args = join('/', $method, @post_args);
+
+                            my @results = ( $post_args =~ /^$attr$/ );
+
+                            if (@results)
+                            {
+                                my $subptr = join('::', $jump_class, $m);
+
+                                return {
+                                    class        => $jump_class,
+                                    method       => $m,
+                                    sub          => \&$subptr,
+                                    index        => 0,
+                                    dispatch_url => $called_path,
+                                };
+                            }
+                        }
+
+                    }
                 }
+
                 unshift @post_args, $method;
             }
         }
@@ -200,6 +254,19 @@ sub _class_is_imported
             }
         }        
     }
+}
+
+=head2 r
+
+Returns request object.
+
+=cut
+
+sub r
+{
+    my $self = shift;
+
+    return Drogo::Dispatcher::Request->new($self);
 }
 
 =head1 COPYRIGHT

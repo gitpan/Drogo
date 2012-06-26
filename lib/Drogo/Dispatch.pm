@@ -11,17 +11,28 @@ use Drogo::Server::Test;
 our @ISA    = qw(Exporter Drogo::Dispatcher);
 our @EXPORT = (@Nginx::Simple::HTTP_STATUS_CODES);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
-Drogo::Dispatch - Who knows what it does, it's a magical box!
+Drogo::Dispatch - Dispatching framework for Drogo
 
-usage:
+   For an example on using the dispatcher, please see L<Drogo>.
 
-use Drogo::Disaptch ( mapping => {
-    'tornado' => 'Tornado::App',
-} );
+   use Drogo::Dispatch( auto_import => 1, import_drogo_methods => 1 );
+
+   Parameters:
+
+       import_drogo_methods - Inject methods from L<Drogo> into dispatched class.
+       auto_import - Automatically load modules when they are dispatched, you probably do not want this in a production application.
+
+   Mapping: Drogo can map to entirely different modules with the mapping hash.
+
+   Example:
+
+   use Drogo::Disaptch ( mapping => {
+      'tornado' => 'Tornado::App',
+   } );
 
 =cut
 
@@ -37,9 +48,11 @@ sub import
         my $caller_isa = "$caller\::ISA";
 
         @{$caller_isa} = qw(
-            Drogo
             Drogo::Dispatcher
         );
+
+        push @{$caller_isa}, 'Drogo'
+            if $params{import_drogo_methods};
 
         *{"$caller\::handler"} = sub {
             my ($self, %custom_params) = @_;

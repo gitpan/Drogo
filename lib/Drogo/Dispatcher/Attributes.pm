@@ -8,8 +8,8 @@ package Drogo::Dispatcher::Attributes;
 
 Drogo::Dispatcher::Attributes
 
-Attributes:
-Index, Page
+  Attributes:
+     Index, Page, Action, ActionMatch, ActionRegex
 
 =head1 Synopsis
 
@@ -43,12 +43,29 @@ sub MODIFY_CODE_ATTRIBUTES
         {
             $dispatch_flags{$pack}{$ref} = 'action_match';
         }
+        elsif  ($attr =~ /^ActionRegex/)
+        {
+            if ($attr =~ /^ActionRegex\(['"](.*)['"]\)$/)
+            {
+                my $regex = $1;
+
+                eval { qr/$regex/ };
+                die "Invalid ActionRegex in $pack (ref) $attr: $@\n"
+                    if $@;
+
+                $dispatch_flags{$pack}{$ref} = "action_regex-${regex}";
+            }
+            else
+            {
+                die "Invalid ActionRegex in $pack (ref): $attr\n";
+            }
+        }
         elsif  ($attr =~ /^Path/)
         {
             my $desc;
-            $desc = $1 if $attr =~ /\((.*?)\)$/;
+            $desc = $1 if $attr =~ /\(['"](.*?)['"]\)$/;
 
-            $dispatch_flags{$pack}{$ref} = "$desc";
+            $dispatch_flags{$pack}{$ref} = "path-${desc}";
        }
     }
 

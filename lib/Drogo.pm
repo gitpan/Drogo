@@ -3,7 +3,7 @@ use strict;
 
 use Exporter;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 our @ISA     = qw(Exporter);
 
 use constant OK                             => 0;
@@ -171,7 +171,9 @@ Example/App.pm:
    package Example::App;
    use strict;
 
-   use Drogo::Dispatch( auto_import => 1 );
+   use Drogo::Dispatch( auto_import => 1, import_drogo_methods => 1 );
+   # if you do not use import_drogo_methods, all the drogo methods are
+   # available under the ->r method
 
    sub init
    {
@@ -208,6 +210,16 @@ Example/App.pm:
 
        $self->print('Howdy: ' . $post_args[0]);
    }
+
+   # referenced by /king/whatever/snake/whatever
+   sub beavers :ActionRegex('king/(.*)/snake/(.*)')
+   {
+       my $self = shift;
+       my @args = $self->post_args;
+
+       $self->print("roar: $args[0], $args[1]");
+   }
+}
 
 =cut
 
@@ -423,7 +435,7 @@ sub header
 {
     my ($self, $value) = @_;
 
-    $self->header_set('Content-Type', $value);
+    __PACKAGE__->header_set('Content-Type', $value);
 }
 
 =head3 $self->headers
@@ -524,7 +536,7 @@ sub param
 
             if ($lookup_key)
             {
-                push @values, $self->unescape($part->{data})
+                push @values, __PACKAGE__->unescape($part->{data})
                     if $lookup_key eq $part->{name};
             }
             else
@@ -543,7 +555,7 @@ sub param
             
             if ($lookup_key)
             {
-                push @values, $self->unescape($value)
+                push @values, __PACKAGE__->unescape($value)
                     if $lookup_key eq $key;
             }
             else
@@ -571,11 +583,11 @@ sub param_hash
 
     my %param_hash;
     
-    for my $key ($self->param)
+    for my $key (__PACKAGE__->param)
     {
         next if $param_hash{$key};
         
-        my @params = $self->param($key);
+        my @params = __PACKAGE__->param($key);
         
         if (scalar @params == 1)
         {
@@ -618,6 +630,7 @@ sub args         { $request_data{args}    }
 =head3 $self->post_args
 
 Returns array of post_arguments (matching path after a matched ActionMatch attribute)
+Returns array of matching elements when used with ActionRegex.
 
 =cut
 
@@ -700,7 +713,7 @@ sub init_dispatcher {
                     # you've got an error in your error handler
                     warn "Error in error handler... ($class\::error)\n";
 
-                    return $self->init_error($sub_call);
+                    return __PACKAGE__->init_error($sub_call);
                 }
 
                 # reset request data
@@ -735,13 +748,13 @@ sub init_dispatcher {
                         # you've got an error in your error handler
                         warn "Error in error handler... ($class\::error)\n";
 
-                        return $self->init_error($sub_call);
+                        return __PACKAGE__->init_error($sub_call);
                     }
                 }
                 else
                 {
-                    $self->process_auto_header
-                        if $self->auto_header and $self->dispatching;
+                    __PACKAGE__->process_auto_header
+                        if __PACKAGE__->auto_header and __PACKAGE__->dispatching;
 
                     # cleanup drogo internals from dispatch
                     &cleanup($r);
@@ -754,7 +767,7 @@ sub init_dispatcher {
 
         my $error = $request_meta_data{'error'};
 
-        if ($self->dispatching)
+        if (__PACKAGE__->dispatching)
         {
             eval { 
                 local $SIG{__DIE__} = sub { &format_error(shift) };
@@ -779,7 +792,7 @@ sub init_dispatcher {
                     # you've got an error in your error handler
                     warn "Error in error handler... ($class\::error)\n";
 
-                    return $self->init_error($sub_call);
+                    return __PACKAGE__->init_error($sub_call);
                 }
 
                 # reset request data
@@ -814,13 +827,13 @@ sub init_dispatcher {
                         # you've got an error in your error handler
                         warn "Error in error handler... ($class\::error)\n";
 
-                        return $self->init_error($sub_call);
+                        return __PACKAGE__->init_error($sub_call);
                     }
                 }
                 else
                 {
-                    $self->process_auto_header
-                        if $self->auto_header and $self->dispatching;
+                    __PACKAGE__->process_auto_header
+                        if __PACKAGE__->auto_header and __PACKAGE__->dispatching;
 
                     # cleanup drogo internals from dispatch
                     &cleanup($r);
@@ -832,13 +845,13 @@ sub init_dispatcher {
             else
             {
                 # process all data
-                $self->process_auto_header
-                    if $self->auto_header and $self->dispatching;
+                __PACKAGE__->process_auto_header
+                    if __PACKAGE__->auto_header and __PACKAGE__->dispatching;
 
                 # post-run sub, if defined
                 my $cleanup_class = $base_class || $class;
                 if (UNIVERSAL::can($cleanup_class, 'cleanup') and $method ne 'error'
-                    and $self->dispatching)
+                    and __PACKAGE__->dispatching)
                 {
                     no strict 'refs';
                     eval { 
@@ -867,7 +880,7 @@ sub init_dispatcher {
     }
     else
     {
-        return $self->init_error($r, $sub_call);
+        return __PACKAGE__->init_error($r, $sub_call);
     }
 }
 
@@ -881,18 +894,18 @@ sub process_auto_header
 {
     my $self = shift;
 
-    $self->server->status($self->status);
+    __PACKAGE__->server->status($self->status);
             
     my $content_type = delete $request_data{headers}{'Content-Type'};
 
-    $self->server->header_out($_, $request_data{headers}{$_})
+    __PACKAGE__->server->header_out($_, $request_data{headers}{$_})
         for keys %{$request_data{headers}};
 
-    $self->server->send_http_header($content_type);
+    __PACKAGE__->server->send_http_header($content_type);
 
-    $self->server->print($request_data{output});
+    __PACKAGE__->server->print($request_data{output});
 
-    $self->flush;
+    __PACKAGE__->flush;
 }
 
 sub format_error
@@ -974,7 +987,7 @@ sub unescape
     my ($self, $value) = @_;
 
     $value =~ s/\+/ /g;
-    $value = $self->server->unescape($value);
+    $value = __PACKAGE__->server->unescape($value);
 
     return $value;
 }

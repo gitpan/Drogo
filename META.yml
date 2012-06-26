@@ -3,11 +3,12 @@ abstract: 'Lightweight web framework'
 author:
   - ', 2012 Ohio-Pennsylvania Software, LLC.'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
+  ExtUtils::MakeMaker: 6.59
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
+  ExtUtils::MakeMaker: 6.59
 distribution_type: module
-generated_by: 'Module::Install version 1.02'
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,9 +22,10 @@ requires:
   CGI::Cookie: 0
   File::Path: 0
   Time::HiRes: 0
+  URI: 0
   XML::Simple: 0
   YAML: 0
   perl: 5.8.4
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.07
+version: 0.08

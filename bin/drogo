@@ -233,7 +233,11 @@ locations:
 package ${project}::App;
 use strict;
 
-use Drogo::Dispatch( auto_import => 1 );
+use Drogo::Dispatch( auto_import => 1, import_drogo_methods => 1 );
+
+# if you do not use import_drogo_methods, all the drogo methods are
+# available under the ->r method
+
 
 sub handler_nginx
 {
@@ -350,6 +354,15 @@ sub forest :Index
     my \$self = shift;
 
     \$self->print("Word of day: \$self->{foo}");
+}
+
+# referenced by taco/king/rattle/snake/dance
+sub beavers :ActionRegex('king/(.*)/snake/(.*)')
+{
+    my \$self = shift;
+    my \@args = \$self->post_args;
+
+    \$self->print("roar: \$args[0], \$args[1]");
 }
 
 1;
