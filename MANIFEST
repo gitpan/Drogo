@@ -17,8 +17,9 @@ lib/Drogo/Dispatch.pm
 lib/Drogo/Dispatcher.pm
 lib/Drogo/Dispatcher/Attributes.pm
 lib/Drogo/Dispatcher/Request.pm
+lib/Drogo/Dispatcher/RequestResponse.pm
+lib/Drogo/Dispatcher/Response.pm
 lib/Drogo/MultiPart.pm
-lib/Drogo/Plugin/DBIx/Class.pm
 lib/Drogo/Server.pm
 lib/Drogo/Server/Nginx.pm
 lib/Drogo/Server/PSGI.pm

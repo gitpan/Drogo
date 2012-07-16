@@ -3,46 +3,9 @@ use strict;
 
 use Exporter;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our @ISA     = qw(Exporter);
 
-use constant OK                             => 0;
-use constant DECLINED                       => -5;
-
-use constant HTTP_OK                        => 200;
-use constant HTTP_CREATED                   => 201;
-use constant HTTP_ACCEPTED                  => 202;
-use constant HTTP_NO_CONTENT                => 204;
-use constant HTTP_PARTIAL_CONTENT           => 206;
-
-use constant HTTP_MOVED_PERMANENTLY         => 301;
-use constant HTTP_MOVED_TEMPORARILY         => 302;
-use constant HTTP_REDIRECT                  => 302;
-use constant HTTP_NOT_MODIFIED              => 304;
-
-use constant HTTP_BAD_REQUEST               => 400;
-use constant HTTP_UNAUTHORIZED              => 401;
-use constant HTTP_PAYMENT_REQUIRED          => 402;
-use constant HTTP_FORBIDDEN                 => 403;
-use constant HTTP_NOT_FOUND                 => 404;
-use constant HTTP_NOT_ALLOWED               => 405;
-use constant HTTP_NOT_ACCEPTABLE            => 406;
-use constant HTTP_REQUEST_TIME_OUT          => 408;
-use constant HTTP_CONFLICT                  => 409;
-use constant HTTP_GONE                      => 410;
-use constant HTTP_LENGTH_REQUIRED           => 411;
-use constant HTTP_REQUEST_ENTITY_TOO_LARGE  => 413;
-use constant HTTP_REQUEST_URI_TOO_LARGE     => 414;
-use constant HTTP_UNSUPPORTED_MEDIA_TYPE    => 415;
-use constant HTTP_RANGE_NOT_SATISFIABLE     => 416;
-
-use constant HTTP_INTERNAL_SERVER_ERROR     => 500;
-use constant HTTP_SERVER_ERROR              => 500;
-use constant HTTP_NOT_IMPLEMENTED           => 501;
-use constant HTTP_BAD_GATEWAY               => 502;
-use constant HTTP_SERVICE_UNAVAILABLE       => 503;
-use constant HTTP_GATEWAY_TIME_OUT          => 504;
-use constant HTTP_INSUFFICIENT_STORAGE      => 507;
 use constant OK                             => 0;
 use constant DECLINED                       => -5;
 
@@ -171,9 +134,7 @@ Example/App.pm:
    package Example::App;
    use strict;
 
-   use Drogo::Dispatch( auto_import => 1, import_drogo_methods => 1 );
-   # if you do not use import_drogo_methods, all the drogo methods are
-   # available under the ->r method
+   use Drogo::Dispatch( auto_import => 1 );
 
    sub init
    {
@@ -186,38 +147,57 @@ Example/App.pm:
    {
        my $self = shift;
 
-       $self->header('text/html'); # default
-       $self->status(200); # defaults to 200 anyways
+       # $self->r is a shared response/requet object
+       # $self->request/req gives a request object
+       # $self->response/res gives a response object
+       # $self->dispatcher returns drogo object
+       # $self->server is a server object
 
-       $self->print('Welcome!');
-       $self->print(q[Go here: <a href="/moo">Mooville</a>]);
+       $self->r->header('text/html'); # default
+       $self->r->status(200); # defaults to 200 anyways
+
+       $self->r->print('Welcome!');
+       $self->r->print(q[Go here: <a href="/moo">Mooville</a>]);
    }
 
    # referenced by /foo
    sub foo :Action
    {
        my $self = shift;
-       my $stuff = $self->param('stuff');
+       my $stuff = $self->r->param('stuff');
 
-       $self->print('Howdy!');
+       $self->r->print('Howdy!');
+   }
+
+   sub stream_this :Action
+   {
+       my $self = shift;
+
+       # stop dispatcher
+       $self->dispatcher->dispatching(0);
+
+       $self->server->header_out('ETag' => 'fakeetag');
+       $self->server->header_out('Cache-Control' => 'public, max-age=31536000');
+       $self->server->send_http_header('text/html');
+       $self->server->print('This was directly streamed');
    }
 
    # referenced by /moo/whatever
    sub moo :ActionMatch
    {
        my $self = shift;
-       my @post_args = $self->post_args;
+       my @args = $self->r->matches;
 
-       $self->print('Howdy: ' . $post_args[0]);
+       $self->r->print('Howdy: ' . $args[0]);
    }
 
    # referenced by /king/whatever/snake/whatever
    sub beavers :ActionRegex('king/(.*)/snake/(.*)')
    {
        my $self = shift;
-       my @args = $self->post_args;
+       my @args = $self->matches;
 
-       $self->print("roar: $args[0], $args[1]");
+       $self->r->print("roar: $args[0], $args[1]");
    }
 }
 
@@ -440,7 +420,7 @@ sub header
 
 =head3 $self->headers
 
-Returns hashref of headers.
+Returns hashref of response headers.
 
 =cut
 
@@ -453,7 +433,7 @@ sub headers
 
 =head3 $self->location('url')
 
-Redirect to a url.
+Redirect to a url (sets the Location header out).
 
 =cut
 
@@ -627,10 +607,18 @@ Returns args.
 
 sub args         { $request_data{args}    }
 
-=head3 $self->post_args
+=head3 $self->matches
 
 Returns array of post_arguments (matching path after a matched ActionMatch attribute)
 Returns array of matching elements when used with ActionRegex.
+
+=cut
+
+sub matches   { @{ $request_data{post_args} || [ ] } }
+
+=head3 $self->post_args
+
+Same as matches, deprecated.
 
 =cut
 

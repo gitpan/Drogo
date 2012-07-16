@@ -32,6 +32,10 @@ sub initialize
     {
         $request_data{remote_addr} = $obj->header_in($ip_header);
     }
+    elsif (my $remote_addr = $obj->variable('remote_addr'))
+    {
+        $request_data{remote_addr} = $remote_addr;
+    }
     else
     {
         $request_data{remote_addr} = $obj->SUPER::remote_addr;

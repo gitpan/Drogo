@@ -233,7 +233,7 @@ locations:
 package ${project}::App;
 use strict;
 
-use Drogo::Dispatch( auto_import => 1, import_drogo_methods => 1 );
+use Drogo::Dispatch( auto_import => 1 );
 
 # if you do not use import_drogo_methods, all the drogo methods are
 # available under the ->r method
@@ -260,47 +260,53 @@ sub bad_dispatch
 {
     my \$self = shift;
     
-    \$self->header('text/html'); # default
-    \$self->status(404);
+    \$self->r->header('text/html'); # default
+    \$self->r->status(404);
 
-    \$self->print('bad dispatch!');
+    \$self->r->print('bad dispatch!');
 }
 
 sub error
 {
     my \$self = shift;
     
-    \$self->header('text/html'); # default
-    \$self->status(500);
+    \$self->r->header('text/html'); # default
+    \$self->r->status(500);
 
-    \$self->print('oh gosh');
+    \$self->r->print('oh gosh');
 }
 
 sub primary :Index
 {
     my \$self = shift;
 
-    \$self->header('text/html'); # default
-    \$self->status(200); # defaults to 200 anyways
+    # $self->r is a shared response/requet object
+    # $self->request/req gives a request object
+    # $self->response/res gives a response object
+    # $self->dispatcher returns drogo object
+    # $self->server is a server object
 
-    \$self->print('Welcome!');
-    \$self->print(q[Go here: <a href="/moo">Mooville</a>]);
+    \$self->r->header('text/html'); # default
+    \$self->r->status(200); # defaults to 200 anyways
+
+    \$self->r->print('Welcome!');
+    \$self->r->print(q[Go here: <a href="/moo">Mooville</a>]);
 }
 
 sub moo :Action
 {
     my \$self = shift;
-    \$self->print("Moo!");
-    \$self->print(q[Go here: <a href="/taco/forest">Taco Forest!</a>]);
+    \$self->r->print("Moo!");
+    \$self->r->print(q[Go here: <a href="/taco/forest">Taco Forest!</a>]);
 }
 
 # referenced by /zoo/whatever
 sub zoo :ActionMatch
 {
     my \$self = shift;
-    my \@post_args = \$self->post_args;
+    my \@matches = \$self->r->matches;
 
-    \$self->print('Howdy: ' . \$post_args[0]);
+    \$self->r->print('Howdy: ' . \$matches[0]);
 }
 
 sub stream_this :Action
@@ -308,12 +314,12 @@ sub stream_this :Action
     my \$self = shift;
 
     # stop dispatcher
-    \$self->dispatching(0);
+    \$self->dispatcher->dispatching(0);
 
-    \$self->server->header_out('ETag' => 'fakeetag');
-    \$self->server->header_out('Cache-Control' => 'public, max-age=31536000');
-    \$self->server->send_http_header('text/html');
-    \$self->server->print('This was directly streamed');
+    \$self->r->server->header_out('ETag' => 'fakeetag');
+    \$self->r->server->header_out('Cache-Control' => 'public, max-age=31536000');
+    \$self->r->server->send_http_header('text/html');
+    \$self->r->server->print('This was directly streamed');
 }
 
 sub cleanup
@@ -323,8 +329,8 @@ sub cleanup
     warn sprintf(
         "[%s]\t%s\t%s\\n",
         scalar localtime,
-        \$self->remote_addr,
-        \$self->uri,
+        \$self->r->remote_addr,
+        \$self->r->uri,
         );
 }
 
@@ -346,23 +352,23 @@ sub primary_sub_here :Index
 {
     my \$self = shift;
 
-    \$self->print('move along');
+    \$self->r->print('move along');
 }
 
 sub forest :Index
 {
     my \$self = shift;
 
-    \$self->print("Word of day: \$self->{foo}");
+    \$self->r->print("Word of day: \$self->{foo}");
 }
 
 # referenced by taco/king/rattle/snake/dance
 sub beavers :ActionRegex('king/(.*)/snake/(.*)')
 {
     my \$self = shift;
-    my \@args = \$self->post_args;
+    my \@args = \$self->r->matches;
 
-    \$self->print("roar: \$args[0], \$args[1]");
+    \$self->r->print("roar: \$args[0], \$args[1]");
 }
 
 1;

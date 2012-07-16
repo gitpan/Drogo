@@ -96,6 +96,10 @@ sub initialize
     {
         $self->{remote_addr} = $self->header_in($ip_header);
     }
+    elsif (my $remote_addr = $self->variable('remote_addr'))
+    {
+        $self->{remote_addr} = $remote_addr;
+    }
     else
     {
         $self->{remote_addr} = $self->{env}{REMOTE_ADDR};

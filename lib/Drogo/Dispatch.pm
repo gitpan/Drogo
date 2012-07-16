@@ -107,7 +107,7 @@ sub local_dispatch
         return;
     }
 
-    if ($dispatch_data->{error} eq 'bad_dispatch')
+    if ($dispatch_data->{error} and $dispatch_data->{error} eq 'bad_dispatch')
     {
         return dispatch(
             $self, 

@@ -7,7 +7,7 @@ use base qw(
 
 use strict;
 
-use Drogo::Dispatcher::Request;
+use Drogo::Dispatcher::RequestResponse;
 
 our @EXPORT = qw(dig_for_dispatch);
 
@@ -256,9 +256,17 @@ sub _class_is_imported
     }
 }
 
+=head2 server
+
+Returns server object.
+
+=cut
+
+sub server { shift->r->server }
+
 =head2 r
 
-Returns request object.
+Returns RequestResponse object.
 
 =cut
 
@@ -266,8 +274,40 @@ sub r
 {
     my $self = shift;
 
+    return Drogo::Dispatcher::RequestResponse->new($self);
+}
+
+*dispatcher = *r;
+
+=head2 request
+
+Returns Request object.
+
+=cut
+
+sub request
+{
+    my $self = shift;
+
     return Drogo::Dispatcher::Request->new($self);
 }
+
+*req = *request;
+
+=head2 response
+
+Returns Response object.
+
+=cut
+
+sub response
+{
+    my $self = shift;
+
+    return Drogo::Dispatcher::Response->new($self);
+}
+
+*res = *response;
 
 =head1 COPYRIGHT
 
