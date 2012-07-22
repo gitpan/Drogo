@@ -14,6 +14,8 @@ requires 'Time::HiRes';
 requires 'YAML';
 requires 'File::Path';
 requires 'URI';
+requires 'Cwd';
+requires 'File::Find';
 
 install_script glob('bin/drogo');
 

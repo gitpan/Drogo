@@ -16,10 +16,12 @@ lib/Drogo/Cookie.pm
 lib/Drogo/Dispatch.pm
 lib/Drogo/Dispatcher.pm
 lib/Drogo/Dispatcher/Attributes.pm
-lib/Drogo/Dispatcher/Request.pm
-lib/Drogo/Dispatcher/RequestResponse.pm
-lib/Drogo/Dispatcher/Response.pm
+lib/Drogo/Guts.pm
+lib/Drogo/LoadModules.pm
 lib/Drogo/MultiPart.pm
+lib/Drogo/Request.pm
+lib/Drogo/RequestResponse.pm
+lib/Drogo/Response.pm
 lib/Drogo/Server.pm
 lib/Drogo/Server/Nginx.pm
 lib/Drogo/Server/PSGI.pm

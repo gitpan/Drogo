@@ -1,7 +1,7 @@
-package Drogo::Dispatcher::RequestResponse;
+package Drogo::RequestResponse;
 
 use base qw(
-    Drogo
+    Drogo::Guts
 );
 
 use strict;

@@ -7,7 +7,9 @@ use base qw(
 
 use strict;
 
-use Drogo::Dispatcher::RequestResponse;
+use Drogo::Response;
+use Drogo::Request;
+use Drogo::RequestResponse;
 
 our @EXPORT = qw(dig_for_dispatch);
 
@@ -274,7 +276,7 @@ sub r
 {
     my $self = shift;
 
-    return Drogo::Dispatcher::RequestResponse->new($self);
+    return Drogo::RequestResponse->new($self);
 }
 
 *dispatcher = *r;
@@ -289,7 +291,7 @@ sub request
 {
     my $self = shift;
 
-    return Drogo::Dispatcher::Request->new($self);
+    return Drogo::Request->new($self);
 }
 
 *req = *request;
@@ -304,7 +306,7 @@ sub response
 {
     my $self = shift;
 
-    return Drogo::Dispatcher::Response->new($self);
+    return Drogo::Response->new($self);
 }
 
 *res = *response;

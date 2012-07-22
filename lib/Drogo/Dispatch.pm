@@ -3,7 +3,7 @@ package Drogo::Dispatch;
 use Exporter;
 use strict;
 
-use Drogo;
+use Drogo::Guts;
 use Drogo::Dispatcher;
 use Drogo::Server::Test;
 
@@ -19,11 +19,11 @@ Drogo::Dispatch - Dispatching framework for Drogo
 
    For an example on using the dispatcher, please see L<Drogo>.
 
-   use Drogo::Dispatch( auto_import => 1, import_drogo_methods => 1 );
+   use Drogo::Dispatch( auto_import => 1 );
 
    Parameters:
 
-       import_drogo_methods - Inject methods from L<Drogo> into dispatched class.
+       import_drogo_methods - Inject methods from L<Drogo::Guts> into dispatched class, which is deprecated.
        auto_import - Automatically load modules when they are dispatched, you probably do not want this in a production application.
 
    Mapping: Drogo can map to entirely different modules with the mapping hash.
@@ -51,7 +51,8 @@ sub import
             Drogo::Dispatcher
         );
 
-        push @{$caller_isa}, 'Drogo'
+        # import_drogo_methods is deprecated
+        push @{$caller_isa}, 'Drogo::Guts'
             if $params{import_drogo_methods};
 
         *{"$caller\::handler"} = sub {

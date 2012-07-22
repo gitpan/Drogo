@@ -1,6 +1,6 @@
-package Drogo::Dispatcher::Response;
+package Drogo::Response;
 
-use Drogo;
+use Drogo::Guts;
 use strict;
 
 sub new 
@@ -17,7 +17,7 @@ Output via http.
 
 =cut
 
-sub print { Drogo::print(@_) }
+sub print { Drogo::Guts::print(@_) }
 
 =head3 $self->header_set('header_type', 'value')
 
@@ -25,7 +25,7 @@ Set output header.
 
 =cut
 
-sub header_set { Drogo::header_set(@_) }
+sub header_set { Drogo::Guts::header_set(@_) }
 
 =head3 $self->header('content-type')
 
@@ -33,7 +33,7 @@ Set content type.
 
 =cut
 
-sub header { Drogo::header(@_) }
+sub header { Drogo::Guts::header(@_) }
 
 
 =head3 $self->headers
@@ -42,7 +42,7 @@ Returns hashref of response headers
 
 =cut
 
-sub headers { Drogo::headers(@_) }
+sub headers { Drogo::Guts::headers(@_) }
 
 =head3 $self->location('url')
 
@@ -50,7 +50,7 @@ Redirect to a url (sets the Location header out).
 
 =cut
 
-sub location { Drogo::location(@_) }
+sub location { Drogo::Guts::location(@_) }
 
 =head3 $self->status(...)
 
@@ -59,9 +59,7 @@ If no argument given, returns status.
 
 =cut
 
-sub status { Drogo::status(@_) }
-
-
+sub status { Drogo::Guts::status(@_) }
 
 =head1 COPYRIGHT
 

@@ -1,6 +1,6 @@
-package Drogo::Dispatcher::Request;
+package Drogo::Request;
 
-use Drogo;
+use Drogo::Guts;
 use strict;
 
 sub new 
@@ -17,7 +17,7 @@ Returns the uri.
 
 =cut
 
-sub uri { Drogo::uri(@_) }
+sub uri { Drogo::Guts::uri(@_) }
 
 
 =head3 $self->header_in
@@ -26,7 +26,7 @@ Return value of header_in.
 
 =cut
 
-sub header_in { Drogo::header_in(@_) }
+sub header_in { Drogo::Guts::header_in(@_) }
 
 =head3 $self->request_body & $self->request
     
@@ -34,8 +34,8 @@ Returns request body.
 
 =cut
 
-sub request_body { Drogo::request_body(@_) }
-sub request { Drogo::request(@_) }
+sub request_body { Drogo::Guts::request_body(@_) }
+sub request { Drogo::Guts::request(@_) }
 
 =head3 $self->request_method
 
@@ -43,8 +43,22 @@ Returns the request_method.
 
 =cut
 
-sub request_method   { Drogo::request_method(@_) }
+sub request_method   { Drogo::Guts::request_method(@_) }
 
+=head3 $self->request_part(...)
+
+Returns reference for upload.
+
+  {
+     'filename' => 'filename',
+     'tmp_file' => '/tmp/drogomp-23198-1330057261',
+     'fh'       => \*{'Drogo::Guts::MultiPart::$request_part{...}'},
+     'name'     => 'foo'
+  }
+
+=cut
+
+sub request_part { Drogo::Guts::request_part(@_) }
 
 =head3 $self->matches
 
@@ -53,7 +67,7 @@ Returns array of matching elements when used with ActionRegex.
 
 =cut
 
-sub matches   { Drogo::matches(@_) }
+sub matches   { Drogo::Guts::matches(@_) }
 
 =head3 $self->param(...)
 
@@ -61,7 +75,7 @@ Return a parameter passed via CGI--works like CGI::param.
 
 =cut
 
-sub param { Drogo::param(@_) }
+sub param { Drogo::Guts::param(@_) }
 
 =head3 $self->param_hash
     
@@ -69,7 +83,7 @@ Return a friendly hashref of CGI parameters.
 
 =cut
 
-sub param_hash { Drogo::param_hash(@_) }
+sub param_hash { Drogo::Guts::param_hash(@_) }
 
 =head1 COPYRIGHT
 
