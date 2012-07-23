@@ -49,6 +49,12 @@ use Time::HiRes qw(gettimeofday tv_interval);
 
 BEGIN { require 5.008004; }
 
+{
+    no strict 'refs';
+    *{"CORE::GLOBAL::original_exit"} = *{"CORE::GLOBAL::exit"};
+    *{"CORE::original_exit"} = *{"CORE::exit"};
+}
+
 # Export all @HTTP_STATUS_CODES
 our @EXPORT = qw(
     OK
@@ -586,9 +592,6 @@ sub init_dispatcher {
         {
             no strict 'refs';
             eval {
-                no strict 'refs';
-                local *{"CORE::GLOBAL::exit"}  = sub { die "drogo-exit\n" };
-
                 local $SIG{__DIE__} = sub { &format_error(shift) };
                 if ($bless)
                 {
@@ -625,8 +628,6 @@ sub init_dispatcher {
 
                 eval {
                     no strict 'refs';
-                    local *{"CORE::GLOBAL::exit"}  = sub { die "drogo-exit\n" };
-
                     local $SIG{__DIE__} = sub { &format_error(shift) };
                     if ($bless)
                     {
@@ -669,8 +670,6 @@ sub init_dispatcher {
         {
             eval {
                 no strict 'refs';
-                local *{"CORE::GLOBAL::exit"}  = sub { die "drogo-exit\n" };
-
                 local $SIG{__DIE__} = sub { &format_error(shift) };
 
                 my @args;
@@ -710,8 +709,6 @@ sub init_dispatcher {
 
                 eval {
                     no strict 'refs';
-                    local *{"CORE::GLOBAL::exit"}  = sub { die "drogo-exit\n" };
-
                     local $SIG{__DIE__} = sub { &format_error(shift) };
                     if ($bless)
                     {
@@ -757,11 +754,8 @@ sub init_dispatcher {
                 if (UNIVERSAL::can($cleanup_class, 'cleanup') and $method ne 'error'
                     and __PACKAGE__->dispatching)
                 {
-                    no strict 'refs';
-                    eval { 
+                    eval {
                         no strict 'refs';
-                        local *{"CORE::GLOBAL::exit"}  = sub { die "drogo-exit\n" };
-
                         local $SIG{__DIE__} = sub { &format_error(shift) };
                         if ($bless)
                         {
@@ -790,6 +784,14 @@ sub init_dispatcher {
         return __PACKAGE__->init_error($r, $sub_call);
     }
 }
+
+=head3 detach
+
+Stops processing and "exits"
+
+=cut
+
+sub detach { die "drogo-exit\n" }
 
 =head3 process_auto_header
 

@@ -1,6 +1,6 @@
 package Drogo;
 use strict;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -59,6 +59,7 @@ Example/App.pm:
 
        $self->r->print('Welcome!');
        $self->r->print(q[Go here: <a href="/moo">Mooville</a>]);
+       $self->r->detach; # stop any dispatching now and exit
    }
 
    # referenced by /foo
