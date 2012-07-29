@@ -16,6 +16,7 @@ requires 'File::Path';
 requires 'URI';
 requires 'Cwd';
 requires 'File::Find';
+requires 'IO::File';
 
 install_script glob('bin/drogo');
 

@@ -1,5 +1,6 @@
 package Drogo::MultiPart;
 use strict;
+use IO::File;
 
 =head1 MODULE
 
@@ -123,7 +124,7 @@ sub process
                 {
                     $request_part{filename} = $filename;
                     $request_part{tmp_file} = $tmpdir . '/' . tmpfilename();
-                    open($request_part{fh}, '>' . $request_part{tmp_file});
+                    $request_part{fh} = IO::File->new('> ' . $request_part{tmp_file});
                 }
                 else
                 {

@@ -2,6 +2,7 @@ package Drogo::Server::PSGI;
 use strict;
 use URI::Escape;
 use PSGI;
+use IO::File;
 
 use base 'Drogo::Server';
 
@@ -140,13 +141,13 @@ sub process_request_method
     else
     {
         $self->{tmp_file} = $tmpdir . '/' . tmpfilename();
-        open(my $fh, '>' . $self->{tmp_file});
+        my $fh = IO::File->new('> ' . $self->{tmp_file});
 
         my $buffer;
         $fh->print($buffer) while($input->read($buffer, 1024));
         $fh->close;
 
-        open($self->{input_fh}, '<' . $self->{tmp_file});
+        $self->{input_fh} = IO::File->new('< ' . $self->{tmp_file});
     }
 
     my $input = '';

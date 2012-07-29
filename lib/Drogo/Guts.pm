@@ -49,12 +49,6 @@ use Time::HiRes qw(gettimeofday tv_interval);
 
 BEGIN { require 5.008004; }
 
-{
-    no strict 'refs';
-    *{"CORE::GLOBAL::original_exit"} = *{"CORE::GLOBAL::exit"};
-    *{"CORE::original_exit"} = *{"CORE::exit"};
-}
-
 # Export all @HTTP_STATUS_CODES
 our @EXPORT = qw(
     OK

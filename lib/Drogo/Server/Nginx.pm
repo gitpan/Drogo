@@ -1,5 +1,6 @@
 package Drogo::Server::Nginx;
 use strict;
+use IO::File;
 
 =head1 NAME
 
@@ -106,7 +107,7 @@ sub request_body_override
     {
         my $input = '';
 
-        open($request_data{input_fh}, $self->request_body_file);
+        $request_data{input_fh} = IO::File->new('< ' . $self->request_body_file);
         $request_data{input_fh}->read($input, $self->post_limit);
         $request_data{request_body} = $input;
     }
@@ -115,11 +116,11 @@ sub request_body_override
     {
         $request_data{tmp_file} = $tmpdir . '/' . tmpfilename();
 
-        open(my $wfh, '>' . $request_data{tmp_file});
+        my $wfh = IO::File->new('> ' . $request_data{tmp_file});
         $wfh->print($self->SUPER::request_body);
         $wfh->close;
 
-        open($request_data{input_fh}, '<' . $request_data{tmp_file});
+        $request_data{input_fh} = IO::File->new('< ' . $request_data{tmp_file});
 
         my $input = '';
         $request_data{input_fh}->read($input, $self->post_limit);
