@@ -108,7 +108,8 @@ sub request_body_override
         my $input = '';
 
         $request_data{input_fh} = IO::File->new('< ' . $self->request_body_file);
-        $request_data{input_fh}->read($input, $self->post_limit);
+        $request_data{input_fh}->read($input, $self->post_limit)
+            if $request_data{input_fh};
         $request_data{request_body} = $input;
     }
 

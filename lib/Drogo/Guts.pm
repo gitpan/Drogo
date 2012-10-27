@@ -244,6 +244,7 @@ sub print
     my $self = shift;
 
     $request_data{output} .= join '', @_;
+    return 1;
 }
 
 =head3 $self->auto_header
