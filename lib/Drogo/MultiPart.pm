@@ -67,19 +67,11 @@ sub process
             {
                 # stop writing
                 close($request_part{fh});
+
                 $request_part{size} = -s $request_part{tmp_file};
 
-                if ($request_part{size} > 0)
-                {
-                    # open for reading only
-                    open($request_part{fh}, '<' . $request_part{tmp_file});
-                }
-                else
-                {
-                    # if there's no upload (0 bytes), don't bother with it
-                    delete($request_part{fh});
-                    unlink($request_part{tmp_file});
-                }
+                # open for reading only
+                open($request_part{fh}, '<' . $request_part{tmp_file});
             }
 
             push @request_parts, { %request_part };
