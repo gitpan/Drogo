@@ -41,6 +41,8 @@ sub import
             $caller_dir = join('/', @caller_dir) . '/' . $path;
         }
 
+        $caller_dir = Cwd::abs_path($caller_dir);
+
         die "$caller_dir does not exist" unless -d $caller_dir;
 
         my @files;
@@ -49,14 +51,12 @@ sub import
             no_chdir => 1,
         }, $caller_dir);
 
-        my $cwd_path = getcwd();
-
-        FILE: for my $file (@files)
+        FILE: for my $rel_file (@files)
         {
             # do nothing with directories
-            next if -d $file;
+            next if -d $rel_file;
 
-            $file = Cwd::abs_path($file);
+            my $file = Cwd::abs_path($rel_file);
 
             # only include perl files
             next unless $file =~ /\.pm$/;
@@ -75,7 +75,7 @@ sub import
                 next FILE if $file =~ /$skip/;
             }
 
-            (my $local_file = $file) =~ s/$cwd_path\///;
+            (my $local_file = $file) =~ s/$caller_dir\///;
             my (undef, @rest_path) = split('/', $local_file);
             my $soft_path = join('/', @rest_path);
 
@@ -83,6 +83,7 @@ sub import
             next if $INC{$local_file};
             next if $INC{$soft_path};
             next if $INC{$file};
+            next if $INC{$rel_file};
 
             # actually require it
             require $file;
