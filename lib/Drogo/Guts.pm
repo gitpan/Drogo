@@ -539,7 +539,8 @@ sub handle_request_body
 
     my %params;
 
-    if (scalar(@r_body) == 1)
+    # if no args are passed, assume they are in the post
+    if (not $r->args and scalar(@r_body) == 1)
     {
         $params{args} = $request_body;
     }
