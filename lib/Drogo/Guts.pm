@@ -534,13 +534,12 @@ sub handle_request_body
     my $r = shift;
 
     my $request_body = $r->request_body;
-
-    my @r_body = split("\n", $request_body);
-
     my %params;
 
     # if no args are passed, assume they are in the post
-    if (not $r->args and scalar(@r_body) == 1)
+    if (not $r->args and
+        substr($request_body, 0, 1) ne '{' and
+        index($request_body, "\n") == -1)
     {
         $params{args} = $request_body;
     }
@@ -548,7 +547,7 @@ sub handle_request_body
     {
         # decode multi-part data
         $params{request_parts} = Drogo::MultiPart::process($r)
-            if $r_body[0] =~ /^-/;
+            if substr($request_body, 0, 1) eq '-';
     }
 
     return &init_dispatcher($r, %params);
