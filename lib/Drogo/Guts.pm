@@ -565,13 +565,13 @@ sub init_dispatcher {
         args          => $params{args}    || $r->args,
         request_parts => $params{request_parts},
         begin_time    => [gettimeofday],
-        post_args     => delete $request_meta_data{post_args},
+        post_args     => $request_meta_data{post_args},
     );
 
-    my $class      = delete $request_meta_data{'call_class'};
-    my $bless      = delete $request_meta_data{'bless'};
-    my $base_class = delete $request_meta_data{'base_class'};
-    my $method     = delete $request_meta_data{'call_method'};
+    my $class      = $request_meta_data{'call_class'};
+    my $bless      = $request_meta_data{'bless'};
+    my $base_class = $request_meta_data{'base_class'};
+    my $method     = $request_meta_data{'call_method'};
 
     my $self = { };
     $bless ? bless($self, $class) : bless($self);
@@ -800,7 +800,7 @@ sub process_auto_header
 
     __PACKAGE__->server->status($self->status);
             
-    my $content_type = delete $request_data{headers}{'Content-Type'};
+    my $content_type = $request_data{headers}{'Content-Type'};
 
     __PACKAGE__->server->header_out($_, $request_data{headers}{$_})
         for keys %{$request_data{headers}};
