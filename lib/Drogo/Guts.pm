@@ -800,12 +800,14 @@ sub process_auto_header
 
     __PACKAGE__->server->status($self->status);
             
-    my $content_type = $request_data{headers}{'Content-Type'};
+    my $content_type = delete $request_data{headers}{'Content-Type'};
 
     __PACKAGE__->server->header_out($_, $request_data{headers}{$_})
         for keys %{$request_data{headers}};
 
     __PACKAGE__->server->send_http_header($content_type);
+
+    $request_data{headers}{'Content-Type'} = $content_type;
 
     __PACKAGE__->server->print($request_data{output});
 

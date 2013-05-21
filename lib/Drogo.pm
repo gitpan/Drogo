@@ -1,6 +1,6 @@
 package Drogo;
 use strict;
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 =head1 NAME
 
