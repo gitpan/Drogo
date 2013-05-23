@@ -131,7 +131,10 @@ sub dispatch
         base_class   => $base_class   || '',
         dispatch_url => $dispatch_url || '',
         post_args    => ($post_args   || [ ]),
+        server_class => ref($r),
     );
+
+    &_store_request_meta_data($r);
 
     unless ($method eq 'error')
     {
@@ -533,6 +536,14 @@ sub handle_request_body
 {
     my $r = shift;
 
+    # reinflate $r if necessary
+    &_inflate_request_meta_data($r);
+    if (ref($r) ne $request_meta_data{server_class})
+    {
+        my $server_class = $request_meta_data{server_class};
+        $server_class->initialize($r);
+    }
+    
     my $request_body = $r->request_body;
     my %params;
 
@@ -916,6 +927,30 @@ Returns elapsed time since initial dispatch.
 =cut
 
 sub elapsed_time { tv_interval($request_data{begin_time}, [gettimeofday]) }
+
+
+
+sub _store_request_meta_data
+{
+    my $r = shift;
+
+    # nginx needs to pass this data between threads
+    $r->variable( $_ => $request_meta_data{$_} )
+        for qw(call_class call_method error bless base_class dispatch_url server_class);
+
+    # dragons
+    $r->variable( post_args => join('|', @{$request_meta_data{post_args} || [ ]}) );
+}
+
+sub _inflate_request_meta_data
+{
+    my $r = shift;
+    %request_meta_data = ( );
+    $request_meta_data{$_} = $r->variable($_)
+        for qw(call_class call_method error bless base_class dispatch_url server_class);
+    $request_meta_data{post_args} = 
+        [ split(/\|/, $r->variable('post_args')) ];
+}
 
 =head1 COPYRIGHT
 
