@@ -59,11 +59,13 @@ sub read
     return parse CGI::Cookie($cookies);
 }
 
-=head1 COPYRIGHT
+=head1 AUTHORS
 
-Copyright 2011, 2012 Ohio-Pennsylvania Software, LLC.
+Bizowie <http://bizowie.com>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 Bizowie
 
 This library is free software. You can redistribute it and/or modify it under the same terms as Perl itself.
 

@@ -543,7 +543,7 @@ sub handle_request_body
         my $server_class = $request_meta_data{server_class};
         $server_class->initialize($r);
     }
-    
+
     my $request_body = $r->request_body;
     my %params;
 
@@ -952,11 +952,13 @@ sub _inflate_request_meta_data
         [ split(/\|/, $r->variable('post_args')) ];
 }
 
-=head1 COPYRIGHT
+=head1 AUTHORS
 
-Copyright 2011, 2012 Ohio-Pennsylvania Software, LLC.
+Bizowie <http://bizowie.com>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 Bizowie
 
 This library is free software. You can redistribute it and/or modify it under the same terms as Perl itself.
 
