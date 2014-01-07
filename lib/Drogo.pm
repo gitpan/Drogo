@@ -1,6 +1,6 @@
 package Drogo;
 use strict;
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 =head1 NAME
 
@@ -107,7 +107,7 @@ Example/App.pm:
 
 =head1 AUTHORS
 
-Bizowie <http://bizowie.com>
+Bizowie, customized L<cloud erp|http://bizowie.com/> solutions.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,7 +1,7 @@
 ---
 abstract: 'Lightweight web framework'
 author:
-  - 'Bizowie <http://bizowie.com>'
+  - 'Bizowie, customized L<cloud erp|http://bizowie.com/> solutions.'
 build_requires:
   ExtUtils::MakeMaker: 6.59
 configure_requires:
@@ -31,4 +31,4 @@ requires:
   perl: 5.8.4
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.22
+version: 0.23
